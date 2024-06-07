@@ -1,6 +1,27 @@
 import random
 from deap import base, creator, tools, algorithms
 
+import csv
+import numpy as np
+
+def read_csv(file_name):
+    with open(file_name, 'r') as file:
+        reader = csv.reader(file)
+        data = list(reader)
+    
+    n = len(data) - 1  # Ignorando a linha de cabeçalho
+    graph = np.zeros((n, n))
+    
+    for i in range(1, n + 1):
+        for j in range(1, n + 1):
+            value = data[i][j]
+            if value == 'NULL':
+                graph[i-1][j-1] = 0
+            else:
+                graph[i-1][j-1] = float(value)
+    
+    return graph
+
 # Define the fitness function
 def evaluate(individual, graph): #a função de fitness é a soma dos pesos das arestas do grafo que estão presentes no subgrafo induzido pelo indivíduo.
     subset = [index for index in range(len(individual)) if individual[index] == 1] #seleciona os vértices que estão presentes no subgrafo induzido pelo indivíduo
@@ -75,5 +96,5 @@ def main(graph): #a função principal do algoritmo genético, que recebe um gra
     return top_ind #retorna o melhor indivíduo
 
 # Example usage:
-# graph = read_csv('graph.csv')
-# best_clique = main(graph)
+graph = read_csv('grafo.csv')
+best_clique = main(graph)
