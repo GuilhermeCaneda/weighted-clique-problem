@@ -18,7 +18,9 @@ def read_csv(file_name):
             if value == 'NULL':
                 graph[i-1][j-1] = 0
             else:
-                graph[i-1][j-1] = float(value)
+                graph[i-1][j-1] = int(value)
+                print(f"graph[{i-1}][{j-1}] = {graph[i-1][j-1]}")
+                #write_csv([i-1, j-1], graph[i-1][j-1])
     
     return graph
 
@@ -36,9 +38,16 @@ def evaluate(individual, graph): #a função de fitness é a soma dos pesos das 
                 return 0, #retorna 0 como valor de fitness
     
     # Calculate the weight of the clique
-    fitness = sum(graph[i][j] for i in subset for j in subset if i != j) #calcula a função de fitness do indivíduo
+    fitness = sum(graph[i][j] for i in subset for j in subset if i != j) / 2 #calcula a função de fitness do indivíduo    
+    write_csv(subset, fitness, len(subset))
+
     return fitness, #retorna o valor de fitness
 
+def write_csv(subset, fitness, len_subset):
+    with open('cliques.csv', mode='a') as file:
+        writer = csv.writer(file)
+        writer.writerow([subset, fitness, len_subset])
+        
 def main(graph): #a função principal do algoritmo genético, que recebe um grafo e retorna o melhor indivíduo encontrado pelo algoritmo genético.
     n = len(graph) #o número de vértices do grafo
     
@@ -96,5 +105,5 @@ def main(graph): #a função principal do algoritmo genético, que recebe um gra
     return top_ind #retorna o melhor indivíduo
 
 # Example usage:
-graph = read_csv('grafo.csv')
+graph = read_csv('employees_interactions.csv')
 best_clique = main(graph)
