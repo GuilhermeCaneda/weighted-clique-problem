@@ -46,7 +46,7 @@ def write_json(filename, status, objective_value, clique_vertices, clique_edges)
         json.dump(data, f, indent=4)
 
 def linear_solution(vertices, edges):
-    prob = pulp.LpProblem("Weight_Clique_Problem_Linear", pulp.LpMaximize)
+    prob = pulp.LpProblem("Weighted_Clique_Problem_Linear", pulp.LpMaximize)
     # Definindo as variáveis de decisão para os vértices e arestas
     x = pulp.LpVariable.dicts("x", vertices, lowBound=0, upBound=1, cat='Continuous')
     y = pulp.LpVariable.dicts("y", edges, lowBound=0, upBound=1, cat='Continuous')
@@ -81,7 +81,7 @@ def linear_solution(vertices, edges):
         return status, objective_value, clique_vertices, clique_edges
 
 def integer_solution(vertices, edges):
-    prob_int = pulp.LpProblem("Weight_Clique_Problem_Integer", pulp.LpMaximize)
+    prob_int = pulp.LpProblem("Weighted_Clique_Problem_Integer", pulp.LpMaximize)
     # Redefinindo as variáveis de decisão para os vértices e arestas como inteiras
     x_int = pulp.LpVariable.dicts("x", vertices, lowBound=0, upBound=1, cat='Integer')
     y_int = pulp.LpVariable.dicts("y", edges, lowBound=0, upBound=1, cat='Integer')
