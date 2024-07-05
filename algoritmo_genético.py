@@ -1,4 +1,5 @@
 import random
+import time
 from deap import base, creator, tools, algorithms
 
 import csv
@@ -18,9 +19,8 @@ def read_csv(file_name):
             if value == 'NULL':
                 graph[i-1][j-1] = 0
             else:
-                graph[i-1][j-1] = int(value)
-                print(f"graph[{i-1}][{j-1}] = {graph[i-1][j-1]}")
-                #write_csv([i-1, j-1], graph[i-1][j-1])
+                graph[i-1][j-1] = float(value)
+                #write_csv([i-1, j-1], graph[i-1][j-1]) #escreve no arquivo csv os vértices e o peso da aresta que foi lida do arquivo csv
     
     return graph
 
@@ -39,7 +39,7 @@ def evaluate(individual, graph): #a função de fitness é a soma dos pesos das 
     
     # Calculate the weight of the clique
     fitness = sum(graph[i][j] for i in subset for j in subset if i != j) / 2 #calcula a função de fitness do indivíduo    
-    write_csv(subset, fitness, len(subset))
+    # write_csv(subset, fitness, len(subset))
 
     return fitness, #retorna o valor de fitness
 
@@ -51,6 +51,12 @@ def write_csv(subset, fitness, len_subset):
 def main(graph): #a função principal do algoritmo genético, que recebe um grafo e retorna o melhor indivíduo encontrado pelo algoritmo genético.
     n = len(graph) #o número de vértices do grafo
     
+    # Remove a função de fitness e o tipo de indivíduo, se eles já existirem
+    if hasattr(creator, 'FitnessMax'):
+        del creator.FitnessMax
+    if hasattr(creator, 'Individual'):
+        del creator.Individual
+
     # Create types
     creator.create("FitnessMax", base.Fitness, weights=(1.0,)) # o 1.0 é o peso da função de fitness, pode ser alterado para testar diferentes valores e ver qual é o melhor para o problema em questão.
     creator.create("Individual", list, fitness=creator.FitnessMax) # o FitnessMax é o tipo de fitness que foi criado na linha anterior, Significa que o indivíduo é uma lista e tem um atributo fitness que é do tipo FitnessMax.
@@ -104,6 +110,27 @@ def main(graph): #a função principal do algoritmo genético, que recebe um gra
     
     return top_ind #retorna o melhor indivíduo
 
-# Example usage:
-graph = read_csv('employees_interactions.csv')
-best_clique = main(graph)
+def run_genetic_algorithm(file_name, num_runs):
+    tempos = []
+    graph = read_csv(file_name)
+
+    for _ in range(num_runs):
+        tempo_inicial = time.time()
+
+        best_clique = main(graph)
+
+        tempo_final = time.time()
+        tempos.append(tempo_final - tempo_inicial)
+
+        print(f"Maior clique encontrada: {best_clique}\n")
+        print(f"Tempo de execução: {tempo_final - tempo_inicial:.3f} segundos")
+    print(f"Tempo médio de execução: {np.mean(tempos):.3f} segundos\n")
+
+    # Imprime os tempos de execução
+    tempos_formatados = [f"{tempo:.3f}" for tempo in tempos]
+    print("Tempos de execução totais:", tempos_formatados)
+
+# Exemplo de uso:
+run_genetic_algorithm('employees_interactions.csv', 1)
+
+
